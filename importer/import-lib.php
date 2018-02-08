@@ -1,5 +1,10 @@
 <?php
+
+require('..\control\includes\config.php');
+
+
 class lgImporter {
+
 
   var $libguides;
   var $db;
@@ -15,7 +20,8 @@ class lgImporter {
   }
 
   function connectDB(){
-    $this->db = new mysqli("127.0.0.1", "lbcc_sp", "constantine", "lbcc_sp");
+    global $hname, $uname, $pword, $dbName_SPlus;
+    $this->db = new mysqli($hname, $uname, $pword, $dbName_SPlus);
     if ($this->db->connect_errno) {
       die("Connection failed: " . $this->db->connect_error);
     };
@@ -112,9 +118,28 @@ class lgImporter {
   }
 
   function addStaff($fname, $lname, $email, $phone, $address){
+
+    if(!$fname){
+      $fname = "''";
+    };
+    if(!$lname){
+      $lname = "''";
+    };
+    if(!$email){
+      $email = "''";
+    };
+    if(!$phone){
+      $phone = "''";
+    };
+    if(!$address){
+      $address = "''";
+    };
+
+
     if (!$this->entryExists('staff', 'email', $email)){
-      $sql = "INSERT INTO staff (lname, fname, email, tel, street_address, user_type_id, department_id)
-      VALUES ('$lname', '$fname', '$email', '$phone', '$address', '1', '1')";
+      $password = md5($lname . '1234!A');
+      $sql = "INSERT INTO staff (fname, lname, department_id, staff_sort, email, user_type_id, password, active, street_address, cell_phone)
+      VALUES ('$fname', '$lname', '1', '0', '$email', '1', '$password', '1', '$address', '$phone' )";
       if ($this->db->query($sql) == TRUE) {
         echo "New record created successfully <br>";
       } else {
