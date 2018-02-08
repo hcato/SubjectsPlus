@@ -5,8 +5,8 @@ class lgImporter {
   var $db;
 
   function __construct($fexport){
-    if (file_exists('./libguides2_export.xml')){
-      $this->libguides = simplexml_load_file('./libguides2_export.xml');
+    if (file_exists($fexport)){
+      $this->libguides = simplexml_load_file($fexport);
     }
     else {
       echo "construct failed";
@@ -40,10 +40,8 @@ class lgImporter {
       //echo $this->libguides->accounts->account[$i]->website;	//TBD
       //echo $this->libguides->accounts->account[$i]->created;	//toss
       //echo $this->libguides->accounts->account[$i]->updated;	//toss
-      //$this->addStaff($fname, $lname, $email, $phone, $address);
-      $stf = new Staff();
+      $this->addStaff($fname, $lname, $email, $phone, $address);
     }
-    echo 'Accounts import done<br>';
   }
 
   function customerImport(){
