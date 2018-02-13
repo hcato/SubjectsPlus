@@ -96,54 +96,38 @@ class lgImporter {
 
   function guidesImport(){
     $guides = $this->libguides->guides->guide->count();
+    $gtypes = array();
     for ($i=0;$i<$guides;$i++){
-      //echo $this->libguides->guides->guide[$i]->id;
+      echo "<br>";
       $type = $this->libguides->guides->guide[$i]->type;
-      $name = $this->libguides->guides->guide[$i]->name;
-      $desc =  $this->libguides->guides->guide[$i]->description;
-      $url = $this->libguides->guides->guide[$i]->url;
-      $o_id = $this->libguides->guides->guide[$i]->owner->id;
-      $o_email = $this->libguides->guides->guide[$i]->owner->email;
-      $o_fname = $this->libguides->guides->guide[$i]->owner->first_name;
-      $o_lname = $this->libguides->guides->guide[$i]->owner->last_name;
-      $o_img = $this->libguides->guides->guide[$i]->owner->image;
-      $group = $this->libguides->guides->guide[$i]->group;
-      $redirect = $this->libguides->guides->guide[$i]->redirect;
-      $status = $this->libguides->guides->guide[$i]->status;
-      $password = $this->libguides->guides->guide[$i]->password;
-      //$created = $this->libguides->guides->guide[$i]->created;
-      //$updated = $this->libguides->guides->guide[$i]->updated;
-      //$published = $this->libguides->guides->guide[$i]->published;
+
+      echo '1: ' . in_array($type, $gtypes, True) . "<br>";
+      array_push($gtypes, $type);
+      var_dump($gtypes[$i]);
+      echo '<br>2: ' . in_array($type, $gtypes, True);
+
+      /*if(in_array($type, $gtypes) == 0){
+        array_push($gtypes, $type);
+        echo $gtypes[$i];
+      };*/
     }
   }
 
   function addStaff($fname, $lname, $email, $phone, $address){
 
-    if(!$fname){
-      $fname = "''";
-    };
-    if(!$lname){
-      $lname = "''";
-    };
-    if(!$email){
-      $email = "''";
-    };
-    if(!$phone){
-      $phone = "''";
-    };
-    if(!$address){
-      $address = "''";
-    };
-
-
     if (!$this->entryExists('staff', 'email', $email)){
+
       $password = md5($lname . '1234!A');
       $sql = "INSERT INTO staff (fname, lname, department_id, staff_sort, email, user_type_id, password, active, street_address, cell_phone)
       VALUES ('$fname', '$lname', '1', '0', '$email', '1', '$password', '1', '$address', '$phone' )";
       if ($this->db->query($sql) == TRUE) {
+
         echo "New record created successfully <br>";
+
       } else {
+
         echo "Error: NO INSERTION <br>" . $this->db->error;
+
       };
     };
   }
