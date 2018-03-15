@@ -5,23 +5,40 @@ include_once('..\lib\SubjectsPlus\Control\Querier.php');
 include_once('..\control\includes\config.php');
 include_once('..\control\includes\functions.php');
 
+//  Start Main
+if($lg = simplexml_load_file("./single-guide.xml")) {
 
-if($lg = simplexml_load_file('./libguides2_export.xml')) {
   foreach ($lg->guides->guide as $gc) {
+
     setPost($gc); //sets _POST fields with appropriate values from XML
     $newgui = new Guide("", "post"); //create new Guide object with _POST values
-    //$newgui->insertRecord(); //insert guide into subject
+    $newgui->insertRecord(); //insert guide into subject
     $subid = fetchSubjectID(getShortform($gc->name)); //retrieve subject_id of guide that was just inserted
 
-
     foreach ($gc->pages->page as $page) {
+
       setTab($page, $subid);
+      $tabid = fetchTabId($subid, ($page->position - 1));
+      $box_count = 0;
+
+      foreach ($page->boxes->box as $box) {
+
+        if (setSection($box_count, $tabid)) {
+          echo "<br>Section insert success!<br>";
+        }
+        else {
+          echo "<br>Something went wrong in setSection()<br>";
+        }
+        $box_count += 1;
+      }
+
     }
     break;
   }
 } else {
   echo "failed to load file";
 }
+//  End Main
 
 /*
 * getShortform() takes a string and returns a checksum
@@ -38,16 +55,63 @@ function getShortform($str) {
 }
 
 /*
-* getStaffId() returns the staff id of the user
+* fetchId() returns the id of an entry in a table
+*   associated with an identifying value
+*/
+function fetchId($table, $column, $value, $id) {
+  $db = new Querier;
+  $sql = "SELECT * FROM {$table} WHERE {$column} = '{$value}'";
+  $result = $db->query($sql);
+  if ($result) {
+    return $result[0]["{$id}"];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/*
+* fetchSectionId() returns the id of an entry
+*   in the 'section' table that matches a
+*   section_index and tab_id
+*/
+function fetchSectionId($section_index, $tab_id) {
+  $db = new Querier;
+  $sql = "SELECT * FROM section WHERE section_index = '{$section_index}' AND tab_id = '{$tab_id}'";
+  $result = $db->query($sql);
+  if ($result) {
+    return $result[0]['section_id'];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/*
+* fetchTabId() returns the id of an entry
+*   in the 'tab' table that matches a
+*   subject_id and tab_index
+*/
+function fetchTabId($subject_id, $tab_index) {
+  $db = new Querier;
+  $sql = "SELECT * FROM tab WHERE subject_id = '{$subject_id}' AND tab_index = '{$tab_index}'";
+  $result = $db->query($sql);
+  if ($result) {
+    return $result[0]['tab_id'];
+  }
+  else {
+    return NULL;
+  }
+}
+
+/*
+* fetchStaffId() returns the staff id of the user
 *   associated with an email address($email)
 */
 function fetchStaffId($email) {
-  $db = new Querier;
-  $sql = "SELECT * FROM staff WHERE email = '{$email}'";
-  //$sql = "SELECT * FROM subject";
-  $result = $db->query($sql);
+  $result = fetchId('staff', 'email', $email, 'staff_id');
   if ($result) {
-    return $result[0]['staff_id'];
+    return $result;
   }
   else {
     return NULL;
@@ -59,20 +123,12 @@ function fetchStaffId($email) {
 *   table entry that matches the provided shortform
 */
 function fetchSubjectID($shortform) {
-  /*
-    code that uses "SELECT `subject_id` FROM `subject` WHERE `shortform` = 'exguide'"
-    to get the subject_id of an entry
-    Possibly uses Querier
-  */
-  $db = new Querier;
-  $sql = "SELECT * FROM subject WHERE shortform = {$shortform}";
-  //$sql = "SELECT * FROM subject";
-  $result = $db->query($sql);
+  $result = fetchId('subject', 'shortform', $shortform, 'subject_id');
   if ($result) {
-    return $result[0]['subject_id'];
+    return $result;
   }
   else {
-    return $result;
+    return NULL;
   }
 }
 
@@ -105,7 +161,7 @@ function setPost($gc) {
 *   creates a new one
 */
 function setTab($page, $subid) {
-
+  //set values from page
   $tab_label = $page->name;
   $tab_index = ($page->position - 1);
   if($page->hidden == 1){
@@ -115,15 +171,38 @@ function setTab($page, $subid) {
     $tab_visibility = 1;
   }
 
-
   $db = new Querier;
   if ($tab_index == 0) {
     $sql = "UPDATE tab SET label='{$tab_label}', visibility={$tab_visibility} WHERE subject_id={$subid} AND tab_index={$tab_index}";
   }
   else {
-    $sql = "INSERT INTO tab (subject_id, label, tab_index, visibility)
-            VALUES ('{$subid}', '{$tab_label}', '{$tab_index}', '{$tab_visibility}')";
+    if (fetchTabId($subid, $tab_index) == NULL){
+      $sql = "INSERT INTO tab (subject_id, label, tab_index, visibility)
+              VALUES ('{$subid}', '{$tab_label}', '{$tab_index}', '{$tab_visibility}')";
+    }
+    else {
+      return;
+    }
   }
   $result = $db->exec($sql);
   return $result;
+}
+
+/*
+*setSection() takes a section_index and
+*   a tab_id and creates a section entry
+*/
+function setSection($section_index, $tabid) {
+  $layout = '0-12-0';
+
+  $db = new Querier;
+  $sql = "INSERT INTO section (section_index, layout, tab_id)
+          VALUES ('{$section_index}', '{$layout}', '{$tabid}')";
+  if (fetchSectionId($section_index, $tabid) == NULL) {
+    $result = $db->exec($sql);
+    return $result;
+  }
+  else {
+    return;
+  }
 }
