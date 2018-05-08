@@ -1,0 +1,86 @@
+DB Foreign Key Flowchart:
+  subject -> tab -> section -> pluslet_section
+
+  pluslet->
+
+  pluslet_section->section->tab->subject
+
+BOX.TYPE = PLUSLET.TYPE
+  Standard = Basic
+  Profile = N/A
+  Gallery = N/A
+  Tabbed = N/A
+
+ASSET.TYPE = PLUSLET.TYPE
+  Rich Text/HTML = BASIC
+  Book from the Catalog = QP maybe?
+  Media / Widget = N/A?
+  Link = Basic or Link List(Requires Record)
+  Database = Basic or Link List(Requires Record)
+  RSS Feed = RSS Feed(Requires JSON in extra for options)
+  Guide List = N/A
+  Google Search = Google Search
+
+
+TABLE '':
+  COLUMN = XML.ELEMENT
+
+  TABLE 'pluslet':
+    pluslet_id = SRC
+    title  = xml.guides.guide.pages.page.boxes.box.name
+    body = xml.guides.guide.pages.page.boxes.box.assets.assest.description
+    local_file = n/a
+    clone = 0;
+    type = xml.guides.guide.pages.page.boxes.box.assets.asset.type;
+    extra - n/a;
+    hide_titlebar - n/a;
+    collapse_body - n/a;
+    titlebar_styling - n/a;
+    favorite_box - n/a;
+    master - n/a;
+    target_blank_links - n/a;
+
+  TABLE 'pluslet_section':
+    pluslet_section_id = SRC
+    pluslet_id = pluslet_id
+    section_id = section_in
+    pcolumn = xml.guides.guide.pages.page.boxes.box.column
+    prow = 1
+
+  TABLE 'section':
+    section_id = SRC
+    section_index = xml.guides.guide.pages.page.boxes.box.position
+    layout = TBD
+    tab_id = tab_id
+
+  TABLE 'tab':
+    tab_id = SRC;
+    subject_id = subject_id;
+    label = xml.guides.guide.pages.page.name;
+    tab_index = xml.guides.guide.pages.page.position;
+    external_url =
+    visibility = xml.guides.guide.pages.page.hidden;
+    *parent = xml.guides.guide.pages.page.parent_page_id;
+    children = n/a
+    extra = n/a
+
+  TABLE 'subject':
+    subject_id = SRC;
+    subject = xml.guides.guide.name;
+    active = *1;
+    shortform = ;
+    redirect_url = xml.guides.guide.redirect;
+    header = default;
+    description = xml.guides.guide.description;
+    keywords = xml.guides.guide.tags;
+    type = xml.guides.guide.type;
+    last_modified = xml.guides.guide.updated;
+    background_link =
+    extra =
+
+  TABLE 'staff_subject':
+    staff_id = xml.guides.guide.owner -> staff_id;
+    subject_id = xml.guides.guide.name -> subject_id;
+
+
+*Needs Confirmation

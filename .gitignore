@@ -139,3 +139,6 @@ import_log.html
 subjectsplus-db-diagram.png
 richter_items.php
 external_scripts
+importer/dblog.txt
+importer/libguides2_export.xml
+importer/single-guide.xml
