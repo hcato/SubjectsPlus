@@ -6,34 +6,34 @@ include_once('..\control\includes\config.php');
 include_once('..\control\includes\functions.php');
 
 //  Start Main
-if($lg = simplexml_load_file("./single-guide.xml")) {
+if($lg = simplexml_load_file("./single-guide.xml")) { // if the libguides xml loads
 
-  foreach ($lg->guides->guide as $gc) {
+  foreach ($lg->guides->guide as $gc) { // for each guide in the original xml
 
     setPost($gc); //sets _POST fields with appropriate values from XML
     $newgui = new Guide("", "post"); //create new Guide object with _POST values
     $newgui->insertRecord(); //insert guide into subject
     $subid = fetchSubjectID(getShortform($gc->name)); //retrieve subject_id of guide that was just inserted
 
-    foreach ($gc->pages->page as $page) {
+    foreach ($gc->pages->page as $page) { // for each page in the current guide
 
-      setTab($page, $subid);
-      $tabid = fetchTabId($subid, ($page->position - 1));
-      $box_count = 0;
+      setTab($page, $subid);  // create or update Tab for the page
+      $tabid = fetchTabId($subid, ($page->position - 1)); // fetch the tab_id associated with the page
+      $box_count = 0; // initialize number of boxes to zero
 
-      foreach ($page->boxes->box as $box) {
+      foreach ($page->boxes->box as $box) { // for each box in the current page
 
-        if (setSection($box_count, $tabid)) {
+        if (setSection($box_count, $tabid)) { // if a new section is created successfully
           echo "<br>Section insert success!<br>";
         }
         else {
           echo "<br>Something went wrong in setSection()<br>";
         }
-        $box_count += 1;
+        $box_count += 1; //increment box count
       }
 
     }
-    break;
+    break; //this break is for testing purposes and ensures only one guide is imported
   }
 } else {
   echo "failed to load file";
@@ -43,7 +43,7 @@ if($lg = simplexml_load_file("./single-guide.xml")) {
 /*
 * getShortform() takes a string and returns a checksum
 *   this is a temporary mesaure to get a unique shortform
-*   for any guides to be import and will likely be removed
+*   for any imported guides and will likely be removed
 *   or changed later on
 */
 function getShortform($str) {
@@ -190,7 +190,10 @@ function setTab($page, $subid) {
 
 /*
 *setSection() takes a section_index and
-*   a tab_id and creates a section entry
+*   a tab_id and creates a section entry.
+*   layout is currently set to one box per
+*   section until we can figure out how
+*   to convert the libguides layouts.
 */
 function setSection($section_index, $tabid) {
   $layout = '0-12-0';

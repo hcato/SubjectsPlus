@@ -1,25 +1,25 @@
 DB Foreign Key Flowchart:
-  subject -> tab -> section -> pluslet_section
-
-  pluslet->
 
   pluslet_section->section->tab->subject
 
-BOX.TYPE = PLUSLET.TYPE
-  Standard = Basic
-  Profile = N/A
-  Gallery = N/A
-  Tabbed = N/A
+BOX TYPES
+  
 
 ASSET.TYPE = PLUSLET.TYPE
   Rich Text/HTML = BASIC
-  Book from the Catalog = QP maybe?
+  Book from the Catalog = This one is a doozy, there are a couple ways we could deal with it
+                            1. A Basic pluslet that uses HTML/CSS to display the info (Likely easiest to do)
+                            2. Create a new Record type for catalog items and then display that somehow
+                            3. A new pluslet type for catalog items (This would be the best solution probably)
   Media / Widget = N/A?
-  Link = Basic or Link List(Requires Record)
-  Database = Basic or Link List(Requires Record)
-  RSS Feed = RSS Feed(Requires JSON in extra for options)
+  Link = Basic(link List seems complicated so just use Basic for now and fill the body with html hyperlinks)
+              <a href="target_url">text</a>
+  Database = Basic(Same as link)
+  RSS Feed = RSS Feed(Requires JSON in 'extra' for options, format below)
+                      {"num_items":int,  "show_desc":0 or 1, "show_feed":0 or 1, "feed_type": "RSS"}
+                      Link goes in 'body' of 'pluslet'
   Guide List = N/A
-  Google Search = Google Search
+  Google Search = GoogleSearch
 
 
 TABLE '':
@@ -27,12 +27,12 @@ TABLE '':
 
   TABLE 'pluslet':
     pluslet_id = SRC
-    title  = xml.guides.guide.pages.page.boxes.box.name
-    body = xml.guides.guide.pages.page.boxes.box.assets.assest.description
+    title  = xml.guides.guide.pages.page.boxes.box.assets.asset.name
+    body = xml.guides.guide.pages.page.boxes.box.assets.asset.description
     local_file = n/a
     clone = 0;
     type = xml.guides.guide.pages.page.boxes.box.assets.asset.type;
-    extra - n/a;
+    extra = n/a;
     hide_titlebar - n/a;
     collapse_body - n/a;
     titlebar_styling - n/a;

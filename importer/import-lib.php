@@ -1,5 +1,5 @@
 <?php
-
+namespace SubjectsPlus\Control;
 require('..\control\includes\config.php');
 
 
