@@ -1,9 +1,15 @@
+  TODO:
+
+  review fetchSectionId
+  finish Pluslet creation and insertion
+  start Pluslet_Section creation and insertion
+
 DB Foreign Key Flowchart:
 
   pluslet_section->section->tab->subject
 
 BOX TYPES
-  
+
 
 ASSET.TYPE = PLUSLET.TYPE
   Rich Text/HTML = BASIC

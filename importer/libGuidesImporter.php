@@ -25,17 +25,24 @@ if($lg = simplexml_load_file("./single-guide.xml")) { // if the libguides xml lo
 
         if (setSection($box_count, $tabid)) { // if a new section is created successfully
           echo "<br>Section insert success!<br>";
+
+          $sectid = fetchSectionId();
+
+          foreach ($box->assests->asset as $asset) {
+
+          }//end of asset loop
         }
         else {
           echo "<br>Something went wrong in setSection()<br>";
         }
         $box_count += 1; //increment box count
-      }
+      }//end of box loop
 
-    }
+    }//end of page loop
     break; //this break is for testing purposes and ensures only one guide is imported
-  }
-} else {
+  }//end of guide loop
+}//end of if(simplexml_load_file())
+else {
   echo "failed to load file";
 }
 //  End Main
@@ -208,4 +215,22 @@ function setSection($section_index, $tabid) {
   else {
     return;
   }
+}
+
+/*
+* setPluslet() takes an asset from
+*   the libguides xml and a section_id
+*   to create a basic pluslet
+*/
+function setPluslet($asset, $sectid){
+  $title = $asset->name;
+  $body = $asset->description;
+  $clone = 0;
+  $type = 'Basic';
+
+  $db = new Querier;
+  $sql = "INSERT INTO pluslet (title, body, clone, type)
+          VALUES ('{$title}', '{$body}', '{$clone}', '{$type}')";
+
+  $result =
 }
